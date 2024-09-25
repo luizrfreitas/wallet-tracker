@@ -1,12 +1,13 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\WalletTrackerController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::controller(DashboardController::class)->group(function () {
-    Route::get('/dashboard', 'index')->name('dashboard.index');
+Route::controller(WalletTrackerController::class)->group(function () {
+    Route::get('/dashboard', 'index')->name('wallet-tracker.index');
+    Route::get('/add_expense', 'addExpense')->name('wallet-tracker.add');
 });
