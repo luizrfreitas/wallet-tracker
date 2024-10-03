@@ -25,4 +25,11 @@ class WalletTrackerController extends Controller
     {
         return response()->noContent(204);
     }
+
+    public function createExpenses(Request $request)
+    {
+        $id = \App\Models\Expense::create($request->all());
+
+        return response()->json(['id' => $id], 200);
+    }
 }

@@ -10,6 +10,8 @@ class Expense extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'expense_tags');
