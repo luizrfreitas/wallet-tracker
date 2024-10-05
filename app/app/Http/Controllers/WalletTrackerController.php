@@ -28,8 +28,28 @@ class WalletTrackerController extends Controller
 
     public function createExpenses(Request $request)
     {
-        $id = \App\Models\Expense::create($request->all());
+        $request->validate([
+            'title' => 'required|string|max:100',
+            'amount' => 'required|numeric|gt:0',
+        ]);
 
-        return response()->json(['id' => $id], 200);
+        $ids = [];
+
+        foreach ($request->all() as $expense) {
+            $ids[] = \App\Models\Expense::create($expense)['id'];
+        }
+
+        return response()->json([$ids], 200);
+    }
+
+    public function createTags(Request $request)
+    {
+        $ids = [];
+
+        foreach ($request->all() as $tag) {
+            $ids[] = \App\Models\Tag::create($tag)['id'];
+        }
+
+        return response()->json([$ids], 200);
     }
 }

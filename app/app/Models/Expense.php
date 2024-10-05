@@ -10,7 +10,7 @@ class Expense extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $guarded = ['id', 'updated_at', 'created_at'];
 
     public function tags(): BelongsToMany
     {

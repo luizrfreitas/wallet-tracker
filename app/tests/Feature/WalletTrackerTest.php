@@ -3,12 +3,15 @@
 namespace Tests\Feature;
 
 use App\Models\Expense;
+use App\Models\Tag;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class WalletTrackerTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function testHomePageRoute(): void
     {
         $response = $this->get('/home');
@@ -37,18 +40,79 @@ class WalletTrackerTest extends TestCase
         $response->assertStatus(204);
     }
 
-    public function testCreateExpenseCorretPostData(): void
+    public function testCreatingCorrectExpenses(): void
     {
-        $body = Expense::factory()->create()->toArray();
-        $body['date'] = $body['date']->format('Y-m-d');
-        unset($body['id']);
+        $expenses = Expense::factory()
+            ->count(3)
+            ->create([
+                'date' => Carbon::now()->toDateString(),
+                'updated_at' => null,
+                'created_at' => null,
+            ])
+            ->toArray();
 
-        $response = $this->post('/expenses', $body);
+        foreach ($expenses as &$expense) {
+            unset($expense['id']);
+        }
+
+        $response = $this->post('/expenses', $expenses);
 
         $response->assertStatus(200);
 
-        $this->assertDatabaseHas('expenses', [
-            'id' => $response->json('id')
-        ]);
+        foreach ($response->json() as $id) {
+            $this->assertDatabaseHas('expenses', [
+                'id' => $id
+            ]);
+        }
+    }
+
+    public function testCreatingIncorrectExpenses(): void
+    {
+        $expenses = Expense::factory()
+            ->count(3)
+            ->create([
+                'date' => Carbon::now()->toDateString(),
+                'updated_at' => null,
+                'created_at' => null,
+            ])
+            ->toArray();
+
+        $expenses[0]['amount'] = 'Amount is a string.';
+        $expenses[1] = [];
+
+        foreach ($expenses as &$expense) {
+            unset($expense['id']);
+        }
+
+        $expenses[2]['id'] = $this->faker->randomNumber();
+
+        $response = $this->post('/expenses', $expenses);
+
+        $response->assertStatus(400);
+    }
+
+    public function testCreatingCorrectTags(): void
+    {
+        $tags = Tag::factory()
+            ->count(3)
+            ->create([
+                'updated_at' => null,
+                'created_at' => null,
+            ])
+            ->toArray();
+
+        foreach ($tags as &$tag) {
+            unset($tag['id']);
+        }
+
+        $response = $this->post('/tags', $tags);
+
+        $response->assertStatus(200);
+
+        foreach ($response->json() as $id) {
+            $this->assertDatabaseHas('tags', [
+                'id' => $id
+            ]);
+        }
     }
 }
