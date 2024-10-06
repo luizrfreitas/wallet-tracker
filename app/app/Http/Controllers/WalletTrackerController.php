@@ -9,22 +9,22 @@ class WalletTrackerController extends Controller
 {
     public function home()
     {
-        return response()->noContent(204);
+        return view('home');
     }
 
     public function tags()
     {
-        return response()->noContent(204);
+        return view('tags');
     }
 
     public function expenses()
     {
-        return response()->noContent(204);
+        return view('expenses');
     }
 
     public function statistics()
     {
-        return response()->noContent(204);
+        return view('statistics');
     }
 
     public function createExpenses(Request $request)
