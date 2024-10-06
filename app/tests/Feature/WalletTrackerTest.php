@@ -88,7 +88,8 @@ class WalletTrackerTest extends TestCase
 
         $response = $this->post('/expenses', $expenses);
 
-        $response->assertStatus(400);
+        $response->assertStatus(302);
+        $response->isRedirect('expenses');
     }
 
     public function testCreatingCorrectTags(): void
@@ -114,5 +115,26 @@ class WalletTrackerTest extends TestCase
                 'id' => $id
             ]);
         }
+    }
+
+    public function testCreatingIncorrectTag(): void
+    {
+        $tags = Tag::factory()
+            ->count(3)
+            ->create([
+                'name' => $this->faker->text(500),
+                'updated_at' => null,
+                'created_at' => null,
+            ])
+            ->toArray();
+
+        foreach ($tags as &$tag) {
+            unset($tag['id']);
+        }
+
+        $response = $this->post('/tags', $tags);
+
+        $response->assertStatus(302);
+        $response->isRedirect('tags');
     }
 }

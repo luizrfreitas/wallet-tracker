@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Validator;
 
 class WalletTrackerController extends Controller
 {
@@ -28,10 +29,16 @@ class WalletTrackerController extends Controller
 
     public function createExpenses(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:100',
-            'amount' => 'required|numeric|gt:0',
+        $validator = Validator::make($request->all(), [
+            '*.title' => 'required|string|max:100',
+            '*.amount' => 'required|numeric|gt:0.0',
         ]);
+
+        if ($validator->fails()) {
+            return redirect('expenses')
+                ->withErrors($validator)
+                ->withInput();
+        }
 
         $ids = [];
 
@@ -44,6 +51,14 @@ class WalletTrackerController extends Controller
 
     public function createTags(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            '*.name' => 'required|string|max:100'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('tags')->withErrors($validator)->withInput();
+        }
+
         $ids = [];
 
         foreach ($request->all() as $tag) {
